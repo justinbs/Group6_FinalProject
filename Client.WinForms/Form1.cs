@@ -1,5 +1,4 @@
-﻿#nullable disable
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -12,45 +11,38 @@ namespace Client.WinForms
 {
     public partial class Form1 : Form
     {
-        // shared
         private readonly HttpClient _http = new HttpClient();
         private ItemApi _itemApi;
         private CategoryApi _categoryApi;
         private SupplierApi _supplierApi;
         private StockMovementApi _movementApi;
 
-        // data caches
         private List<Item> _items = new();
         private List<Category> _categories = new();
         private List<Supplier> _suppliers = new();
 
-        // tabs
-        private TabControl tabs;
-        private TabPage tabItems, tabCategories, tabSuppliers, tabStock;
+        private TabControl tabs = null!;
+        private TabPage tabItems = null!, tabCategories = null!, tabSuppliers = null!, tabStock = null!;
 
-        // Items controls
-        private TextBox txtName, txtCode, txtBrand, txtSearch;
-        private NumericUpDown numUnitPrice, numQty;
-        private ComboBox cmbCategory, cmbSupplier;
-        private Button btnAdd, btnUpdate, btnDelete;
-        private DataGridView gridItems;
+        private TextBox txtName = null!, txtCode = null!, txtBrand = null!, txtSearch = null!;
+        private NumericUpDown numUnitPrice = null!, numQty = null!;
+        private ComboBox cmbCategory = null!, cmbSupplier = null!;
+        private Button btnAdd = null!, btnUpdate = null!, btnDelete = null!;
+        private DataGridView gridItems = null!;
 
-        // Categories controls
-        private TextBox txtCatName;
-        private Button btnCatAdd, btnCatUpdate, btnCatDelete;
-        private DataGridView gridCategories;
+        private TextBox txtCatName = null!;
+        private Button btnCatAdd = null!, btnCatUpdate = null!, btnCatDelete = null!;
+        private DataGridView gridCategories = null!;
 
-        // Suppliers controls
-        private TextBox txtSupName, txtSupContact;
-        private Button btnSupAdd, btnSupUpdate, btnSupDelete;
-        private DataGridView gridSuppliers;
+        private TextBox txtSupName = null!, txtSupContact = null!;
+        private Button btnSupAdd = null!, btnSupUpdate = null!, btnSupDelete = null!;
+        private DataGridView gridSuppliers = null!;
 
-        // Stock controls
-        private ComboBox cmbStkItem, cmbStkType;
-        private NumericUpDown numStkQty;
-        private TextBox txtStkRemarks;
-        private Button btnStkApply;
-        private DataGridView gridMovements;
+        private ComboBox cmbStkItem = null!, cmbStkType = null!;
+        private NumericUpDown numStkQty = null!;
+        private TextBox txtStkRemarks = null!;
+        private Button btnStkApply = null!;
+        private DataGridView gridMovements = null!;
 
         public Form1()
         {
@@ -65,6 +57,8 @@ namespace Client.WinForms
             WireEvents();
         }
 
+        private static int? Val(ComboBox cb) => cb.SelectedValue is int v ? v : (int?)null;
+
         private void BuildLayout()
         {
             tabs = new TabControl { Dock = DockStyle.Fill };
@@ -72,7 +66,6 @@ namespace Client.WinForms
             tabCategories = new TabPage("Categories");
             tabSuppliers = new TabPage("Suppliers");
             tabStock = new TabPage("Stock");
-
             tabs.TabPages.AddRange(new[] { tabItems, tabCategories, tabSuppliers, tabStock });
             Controls.Add(tabs);
 
@@ -102,8 +95,8 @@ namespace Client.WinForms
             var lblSup = new Label { Text = "Supplier" };
 
             txtName = new TextBox(); txtCode = new TextBox(); txtBrand = new TextBox();
-            numUnitPrice = new NumericUpDown { DecimalPlaces = 2, Maximum = 100000000, Minimum = 0, Increment = 1 };
-            numQty = new NumericUpDown { Maximum = 100000000, Minimum = 0, Increment = 1 };
+            numUnitPrice = new NumericUpDown { DecimalPlaces = 2, Maximum = 100000000, Minimum = 0 };
+            numQty = new NumericUpDown { Maximum = 100000000, Minimum = 0 };
             cmbCategory = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList };
             cmbSupplier = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList };
 
@@ -251,7 +244,7 @@ namespace Client.WinForms
 
             cmbStkItem = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList };
             cmbStkType = new ComboBox { DropDownStyle = ComboBoxStyle.DropDownList, DataSource = Enum.GetValues(typeof(MovementType)) };
-            numStkQty = new NumericUpDown { Maximum = 100000000, Minimum = 1, Increment = 1 };
+            numStkQty = new NumericUpDown { Maximum = 100000000, Minimum = 1 };
             txtStkRemarks = new TextBox();
             btnStkApply = new Button { Text = "Apply" };
 
@@ -434,8 +427,8 @@ namespace Client.WinForms
                 Brand = string.IsNullOrWhiteSpace(txtBrand.Text) ? null : txtBrand.Text.Trim(),
                 UnitPrice = numUnitPrice.Value,
                 Quantity = (int)numQty.Value,
-                CategoryId = cmbCategory.SelectedValue as int?,
-                SupplierId = cmbSupplier.SelectedValue as int?
+                CategoryId = Val(cmbCategory),
+                SupplierId = Val(cmbSupplier)
             };
 
             try
@@ -458,8 +451,8 @@ namespace Client.WinForms
                 Brand = string.IsNullOrWhiteSpace(txtBrand.Text) ? null : txtBrand.Text.Trim(),
                 UnitPrice = numUnitPrice.Value,
                 Quantity = (int)numQty.Value,
-                CategoryId = cmbCategory.SelectedValue as int?,
-                SupplierId = cmbSupplier.SelectedValue as int?
+                CategoryId = Val(cmbCategory),
+                SupplierId = Val(cmbSupplier)
             };
 
             try
@@ -535,7 +528,11 @@ namespace Client.WinForms
             if (string.IsNullOrWhiteSpace(txtSupName.Text)) { MessageBox.Show("Name is required."); return; }
             try
             {
-                await _supplierApi.CreateAsync(new Supplier { Name = txtSupName.Text.Trim(), Contact = string.IsNullOrWhiteSpace(txtSupContact.Text) ? null : txtSupContact.Text.Trim() });
+                await _supplierApi.CreateAsync(new Supplier
+                {
+                    Name = txtSupName.Text.Trim(),
+                    Contact = string.IsNullOrWhiteSpace(txtSupContact.Text) ? null : txtSupContact.Text.Trim()
+                });
                 await ReloadAllAsync();
                 txtSupName.Text = ""; txtSupContact.Text = "";
             }
@@ -548,7 +545,11 @@ namespace Client.WinForms
             if (string.IsNullOrWhiteSpace(txtSupName.Text)) { MessageBox.Show("Name is required."); return; }
             try
             {
-                await _supplierApi.UpdateAsync(id, new Supplier { Name = txtSupName.Text.Trim(), Contact = string.IsNullOrWhiteSpace(txtSupContact.Text) ? null : txtSupContact.Text.Trim() });
+                await _supplierApi.UpdateAsync(id, new Supplier
+                {
+                    Name = txtSupName.Text.Trim(),
+                    Contact = string.IsNullOrWhiteSpace(txtSupContact.Text) ? null : txtSupContact.Text.Trim()
+                });
                 await ReloadAllAsync();
             }
             catch (Exception ex) { MessageBox.Show(ex.Message); }

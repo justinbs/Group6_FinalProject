@@ -7,7 +7,6 @@
         public string Code { get; set; } = "";
         public string? Brand { get; set; }
         public decimal UnitPrice { get; set; }
-
         public int Quantity { get; set; }
         public int? CategoryId { get; set; }
         public int? SupplierId { get; set; }

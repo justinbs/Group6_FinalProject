@@ -13,7 +13,7 @@ namespace Client.WinForms.Services
 
         public StockMovementApi(HttpClient http) => _http = http;
 
-        public Task<List<StockMovement>> GetAllAsync() => _http.GetFromJsonAsync<List<StockMovement>>(Base);
+        public Task<List<StockMovement>?> GetAllAsync() => _http.GetFromJsonAsync<List<StockMovement>>(Base);
 
         public async Task<StockMovement?> CreateAsync(StockMovement m)
         {

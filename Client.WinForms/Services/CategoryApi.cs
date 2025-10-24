@@ -13,7 +13,7 @@ namespace Client.WinForms.Services
 
         public CategoryApi(HttpClient http) => _http = http;
 
-        public Task<List<Category>> GetAllAsync() => _http.GetFromJsonAsync<List<Category>>(Base);
+        public Task<List<Category>?> GetAllAsync() => _http.GetFromJsonAsync<List<Category>>(Base);
         public Task<Category?> GetAsync(int id) => _http.GetFromJsonAsync<Category>($"{Base}/{id}");
 
         public async Task<Category?> CreateAsync(Category e)

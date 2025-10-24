@@ -13,7 +13,7 @@ namespace Client.WinForms.Services
 
         public ItemApi(HttpClient http) => _http = http;
 
-        public Task<List<Item>> GetAllAsync() => _http.GetFromJsonAsync<List<Item>>(Base);
+        public Task<List<Item>?> GetAllAsync() => _http.GetFromJsonAsync<List<Item>>(Base);
         public Task<Item?> GetAsync(int id) => _http.GetFromJsonAsync<Item>($"{Base}/{id}");
 
         public async Task<Item?> CreateAsync(Item e)
