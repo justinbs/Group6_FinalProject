@@ -1,97 +1,28 @@
-**Group6_M1Partial – Item Manager**
+**Group6_FinalProject**
+The Client.WinForms project serves as the graphical user interface (GUI) for the Inventory Management System.
+It connects directly to the ASP.NET Core Web API using HttpClient to perform full CRUD operations and manage stock movements.
 
-An ASP.NET Core Web API (.NET 8) with a WinForms client for basic Item CRUD.  
+Features
+CRUD Operations — Add, update, and delete Items, Categories, and Suppliers
+API Integration — Real-time sync with backend using RESTful endpoints
+Stock Movements Tab — Adjust quantities through Purchase, Sale, or Adjustment transactions
+Live Search Filter — Instantly filter items by name, code, or brand
+Async Refresh — Data grids refresh dynamically without freezing the UI
 
-Tech used: C#, ASP.NET Web API, EF Core (SQL Server LocalDB), Dependency Injection, Swagger.  
+How to Run
+Open the solution in Visual Studio 2022 or later
+Set multiple startup projects → select both Api and Client.WinForms to start
+Press F5 to run
+The API will launch in Swagger, and the WinForms client will open automatically
 
-**Tech Stack**  
+API Connection
+The client communicates with the API endpoints via:
+http://localhost:5238/api/
+http://localhost:5238/swagger/
 
-Backend: ASP.NET Core Web API (.NET 8), EF Core, SQL Server LocalDB  
-
-Client: Windows Forms (.NET)  
-
-Patterns: DI, repository/service pattern (lightweight)  
-
-Dev tools: Visual Studio 2022, Swagger UI  
-
-
-
-***********************
-## How to Run (Visual Studio 2022)  
-
-### Prerequisites  
-- Visual Studio 2022 with workloads:
-  - **.NET desktop development**
-  - **ASP.NET and web development**
-- .NET 8 SDK
-- SQL Server **LocalDB** (installed with VS workloads)
-  
-### 1) Clone the repo  
-
-### 2) Open the solution
-- Open Group6_M1Partial.sln in Visual Studio.  
-
-
-### 3) Restore & build
-VS usually restores packages automatically.  
-
-If not: Right-click the solution → Restore NuGet Packages, then Build → Rebuild Solution.  
-
-### 4) Create the database (first run only)
-
-Tools → NuGet Package Manager → Package Manager Console  
-Set Default project (dropdown) to Api  
-
-Run:  
-  Update-Database  
-  
-If you see "no migrations", run:  
-  Add-Migration InitialCreate 
-  Update-Database 
-
-### 5) Ensure API URL and client URL match
-Api/Properties/launchSettings.json should contain:
-  "applicationUrl": "http://localhost:5238"
-
-Client.WinForms/Services/ItemApi.cs should contain:
-  private const string Base = "http://localhost:5238/api/items"; 
-
-### 6) Run both projects together
-   
-Right-click the solution → Configure Startup Projects…
-
-Choose Multiple startup projects:
-  - Api → Start
-  - Client.WinForms → Start
-  - Click OK, then press F5
-  
-Expected result:
-- Swagger opens at http://localhost:5238/swagger
-- WinForms app opens (Item Manager UI)
-  
-  
-### 7) Quick test (WinForms)
-Add an item:  
-Name: Gel Pen Blue  
-Code: GP-BLU  
-Brand: Pilot  
-Unit Price: 24.50  
-
-You should see it in the grid. Try Search, Update, and Delete.  
-***********************
-**API**  
-Base URL: http://localhost:5238/api/items  
-
-
-Verb - Route - Description  
-
-GET - /api/items - List all  
-
-GET - /api/items/{id} - Get by id  
-
-POST - /api/items - Create  
-
-PUT - /api/items/{id} - Update  
-
-DELETE - /api/items/{id} - Delete  
-
+Technologies Used
+C# (.NET 8)
+Windows Forms (WinForms)
+ASP.NET Core Web API
+Entity Framework Core (via API)
+SQL Server LocalDB
