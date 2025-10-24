@@ -6,28 +6,28 @@ using Client.WinForms.Models;
 
 namespace Client.WinForms.Services
 {
-    public class ItemApi
+    public class SupplierApi
     {
         private readonly HttpClient _http;
-        private const string Base = "http://localhost:5238/api/items";
+        private const string Base = "http://localhost:5238/api/suppliers";
 
-        public ItemApi(HttpClient http) => _http = http;
+        public SupplierApi(HttpClient http) => _http = http;
 
-        public Task<List<Item>> GetAllAsync() => _http.GetFromJsonAsync<List<Item>>(Base);
-        public Task<Item?> GetAsync(int id) => _http.GetFromJsonAsync<Item>($"{Base}/{id}");
+        public Task<List<Supplier>> GetAllAsync() => _http.GetFromJsonAsync<List<Supplier>>(Base);
+        public Task<Supplier?> GetAsync(int id) => _http.GetFromJsonAsync<Supplier>($"{Base}/{id}");
 
-        public async Task<Item?> CreateAsync(Item e)
+        public async Task<Supplier?> CreateAsync(Supplier e)
         {
             var res = await _http.PostAsJsonAsync(Base, e);
             res.EnsureSuccessStatusCode();
-            return await res.Content.ReadFromJsonAsync<Item>();
+            return await res.Content.ReadFromJsonAsync<Supplier>();
         }
 
-        public async Task<Item?> UpdateAsync(int id, Item e)
+        public async Task<Supplier?> UpdateAsync(int id, Supplier e)
         {
             var res = await _http.PutAsJsonAsync($"{Base}/{id}", e);
             res.EnsureSuccessStatusCode();
-            return await res.Content.ReadFromJsonAsync<Item>();
+            return await res.Content.ReadFromJsonAsync<Supplier>();
         }
 
         public async Task DeleteAsync(int id)

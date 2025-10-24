@@ -29,4 +29,11 @@ public class ItemsController(IItemService svc) : ControllerBase
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
         => await svc.DeleteAsync(id) ? NoContent() : NotFound();
+
+    [HttpGet("low-stock/{threshold:int}")]
+    public async Task<ActionResult<List<Item>>> LowStock(int threshold = 5)
+    {
+        var all = await svc.GetAllAsync();
+        return all.Where(i => i.Quantity < threshold).ToList();
+    }
 }

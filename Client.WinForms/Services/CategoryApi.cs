@@ -6,28 +6,28 @@ using Client.WinForms.Models;
 
 namespace Client.WinForms.Services
 {
-    public class ItemApi
+    public class CategoryApi
     {
         private readonly HttpClient _http;
-        private const string Base = "http://localhost:5238/api/items";
+        private const string Base = "http://localhost:5238/api/categories";
 
-        public ItemApi(HttpClient http) => _http = http;
+        public CategoryApi(HttpClient http) => _http = http;
 
-        public Task<List<Item>> GetAllAsync() => _http.GetFromJsonAsync<List<Item>>(Base);
-        public Task<Item?> GetAsync(int id) => _http.GetFromJsonAsync<Item>($"{Base}/{id}");
+        public Task<List<Category>> GetAllAsync() => _http.GetFromJsonAsync<List<Category>>(Base);
+        public Task<Category?> GetAsync(int id) => _http.GetFromJsonAsync<Category>($"{Base}/{id}");
 
-        public async Task<Item?> CreateAsync(Item e)
+        public async Task<Category?> CreateAsync(Category e)
         {
             var res = await _http.PostAsJsonAsync(Base, e);
             res.EnsureSuccessStatusCode();
-            return await res.Content.ReadFromJsonAsync<Item>();
+            return await res.Content.ReadFromJsonAsync<Category>();
         }
 
-        public async Task<Item?> UpdateAsync(int id, Item e)
+        public async Task<Category?> UpdateAsync(int id, Category e)
         {
             var res = await _http.PutAsJsonAsync($"{Base}/{id}", e);
             res.EnsureSuccessStatusCode();
-            return await res.Content.ReadFromJsonAsync<Item>();
+            return await res.Content.ReadFromJsonAsync<Category>();
         }
 
         public async Task DeleteAsync(int id)
