@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Api.Services
+namespace Api.Services;
+
+public interface ICrudService<T>
 {
-    public interface ICrudService<T>
-    {
-        Task<List<T>> GetAllAsync();
-        Task<T?> GetAsync(int id);
-        Task<T> CreateAsync(T entity);
-        Task<T?> UpdateAsync(int id, T entity);
-        Task<bool> DeleteAsync(int id);
-    }
+    Task<List<T>> GetAllAsync();
+    Task<T?> GetAsync(int id);
+    Task<T> CreateAsync(T entity);
+    Task<T?> UpdateAsync(int id, T entity);
+    Task<bool> DeleteAsync(int id);
 }

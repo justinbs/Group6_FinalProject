@@ -4,39 +4,51 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Api.Services;
 
-public class ItemService(AppDbContext db) : IItemService
+public class ItemService : IItemService
 {
-    public Task<List<Item>> GetAllAsync() => db.Items.OrderBy(i => i.Name).ToListAsync();
+    private readonly AppDbContext _db;
+    public ItemService(AppDbContext db) => _db = db;
 
-    public Task<Item?> GetAsync(int id) => db.Items.FindAsync(id).AsTask();
+    public Task<List<Item>> GetAllAsync() =>
+        _db.Items.AsNoTracking()
+            .Include(x => x.Category)
+            .Include(x => x.Supplier)
+            .OrderBy(x => x.Name)
+            .ToListAsync();
 
-    public async Task<Item> CreateAsync(Item item)
+    public Task<Item?> GetAsync(int id) =>
+        _db.Items.AsNoTracking()
+            .Include(x => x.Category)
+            .Include(x => x.Supplier)
+            .FirstOrDefaultAsync(x => x.Id == id);
+
+    public async Task<Item> CreateAsync(Item entity)
     {
-        db.Items.Add(item);
-        await db.SaveChangesAsync();
-        return item;
+        _db.Items.Add(entity);
+        await _db.SaveChangesAsync();
+        return entity;
     }
 
-    public async Task<Item?> UpdateAsync(int id, Item item)
+    public async Task<Item?> UpdateAsync(int id, Item entity)
     {
-        var existing = await db.Items.FindAsync(id);
+        var existing = await _db.Items.FirstOrDefaultAsync(x => x.Id == id);
         if (existing is null) return null;
-
-        existing.Name = item.Name;
-        existing.Code = item.Code;
-        existing.Brand = item.Brand;
-        existing.UnitPrice = item.UnitPrice;
-
-        await db.SaveChangesAsync();
+        existing.Name = entity.Name;
+        existing.Brand = entity.Brand;
+        existing.CategoryId = entity.CategoryId;
+        existing.SupplierId = entity.SupplierId;
+        existing.UnitPrice = entity.UnitPrice;
+        // Quantity is updated only through stock movements
+        await _db.SaveChangesAsync();
         return existing;
     }
 
     public async Task<bool> DeleteAsync(int id)
     {
-        var existing = await db.Items.FindAsync(id);
+        var existing = await _db.Items.FirstOrDefaultAsync(x => x.Id == id);
         if (existing is null) return false;
-        db.Items.Remove(existing);
-        await db.SaveChangesAsync();
+        _db.Items.Remove(existing);
+        await _db.SaveChangesAsync();
         return true;
     }
 }

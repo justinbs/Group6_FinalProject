@@ -9,12 +9,18 @@ namespace Client.WinForms.Services
     public class ItemApi
     {
         private readonly HttpClient _http;
-        private const string Base = "http://localhost:5238/api/items";
+        private const string Base = "api/items";
 
-        public ItemApi(HttpClient http) => _http = http;
+        public ItemApi()
+        {
+            _http = new HttpClient { BaseAddress = new System.Uri(ApiBase.BaseUrl) };
+        }
 
-        public Task<List<Item>?> GetAllAsync() => _http.GetFromJsonAsync<List<Item>>(Base);
-        public Task<Item?> GetAsync(int id) => _http.GetFromJsonAsync<Item>($"{Base}/{id}");
+        public Task<List<Item>?> GetAllAsync() =>
+            _http.GetFromJsonAsync<List<Item>>(Base);
+
+        public Task<Item?> GetAsync(int id) =>
+            _http.GetFromJsonAsync<Item>($"{Base}/{id}");
 
         public async Task<Item?> CreateAsync(Item e)
         {

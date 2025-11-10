@@ -4,62 +4,62 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1) Controllers + Swagger
+// Controllers + Swagger
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// 2) DbContext (SQL Server)
+// DbContext
 var connStr = builder.Configuration.GetConnectionString("DefaultConnection")
               ?? "Server=(localdb)\\MSSQLLocalDB;Database=Group6_FinalProject;Trusted_Connection=True;MultipleActiveResultSets=true";
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(connStr));
+builder.Services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(connStr));
 
-// 3) Dependency Injection for ALL services
-builder.Services.AddScoped<IItemService, ItemService>();
-builder.Services.AddScoped<ICategoryService, CategoryService>();
-builder.Services.AddScoped<ISupplierService, SupplierService>(); 
-builder.Services.AddScoped<IStockMovementService, StockMovementService>();
-
-// 4) CORS
+// CORS
 builder.Services.AddCors(opt =>
 {
-    opt.AddPolicy("AllowAll", p =>
-        p.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
+    opt.AddPolicy("AllowAll", b => b.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 });
 
-// Enable CORS
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAll",
-        policy => policy.AllowAnyOrigin()
-                        .AllowAnyMethod()
-                        .AllowAnyHeader());
-});
+// DI
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<ISupplierService, SupplierService>();
+builder.Services.AddScoped<IItemService, ItemService>();
+builder.Services.AddScoped<IStockService, StockService>();
+builder.Services.AddScoped<IReportService, ReportService>();
 
 var app = builder.Build();
 
-// 5) Dev tools (Swagger)
 if (app.Environment.IsDevelopment())
 {
+    app.UseDeveloperExceptionPage();
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// 6) Ensure DB is created & migrations applied at startup
+// ---- DEV: ALWAYS drop and recreate to avoid stale schemas ----
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.Migrate(); // applies pending migrations automatically
+
+    app.Logger.LogWarning("Using connection string: {Conn}", connStr);
+
+    if (app.Environment.IsDevelopment())
+    {
+        app.Logger.LogWarning("DEV mode: Ensuring database is FRESH (EnsureDeleted + EnsureCreated)...");
+        db.Database.EnsureDeleted();
+        db.Database.EnsureCreated();
+    }
+    else
+    {
+        db.Database.Migrate();
+    }
+
+    await DbSeeder.SeedAsync(db);
 }
+// --------------------------------------------------------------
 
-// 7) Middleware pipeline
-app.UseHttpsRedirection();
 app.UseCors("AllowAll");
-app.UseAuthorization();
-
-// 8) Map controllers
 app.MapControllers();
+app.MapGet("/healthz", () => Results.Ok(new { ok = true }));
 
-// 9) Run
 app.Run();

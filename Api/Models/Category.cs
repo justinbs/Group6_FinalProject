@@ -1,11 +1,7 @@
-﻿namespace Api.Models
-{
-    public class Category
-    {
-        public int Id { get; set; }
-        public string Name { get; set; } = "";
+﻿namespace Api.Models;
 
-        // Navigation
-        public List<Item> Items { get; set; } = new();
-    }
+public class Category
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = "";
 }

@@ -9,12 +9,18 @@ namespace Client.WinForms.Services
     public class CategoryApi
     {
         private readonly HttpClient _http;
-        private const string Base = "http://localhost:5238/api/categories";
+        private const string Base = "api/categories";
 
-        public CategoryApi(HttpClient http) => _http = http;
+        public CategoryApi()
+        {
+            _http = new HttpClient { BaseAddress = new System.Uri(ApiBase.BaseUrl) };
+        }
 
-        public Task<List<Category>?> GetAllAsync() => _http.GetFromJsonAsync<List<Category>>(Base);
-        public Task<Category?> GetAsync(int id) => _http.GetFromJsonAsync<Category>($"{Base}/{id}");
+        public Task<List<Category>?> GetAllAsync() =>
+            _http.GetFromJsonAsync<List<Category>>(Base);
+
+        public Task<Category?> GetAsync(int id) =>
+            _http.GetFromJsonAsync<Category>($"{Base}/{id}");
 
         public async Task<Category?> CreateAsync(Category e)
         {

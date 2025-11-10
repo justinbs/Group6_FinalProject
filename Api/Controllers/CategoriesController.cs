@@ -2,63 +2,42 @@
 using Api.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Api.Controllers
+namespace Api.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class CategoriesController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class CategoriesController : ControllerBase
+    private readonly ICategoryService _svc;
+    public CategoriesController(ICategoryService svc) => _svc = svc;
+
+    [HttpGet] public Task<List<Category>> GetAll() => _svc.GetAllAsync();
+
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult<Category>> Get(int id)
     {
-        private readonly ICategoryService _service;
+        var e = await _svc.GetAsync(id);
+        return e is null ? NotFound() : Ok(e);
+    }
 
-        public CategoriesController(ICategoryService service)
-        {
-            _service = service;
-        }
+    [HttpPost]
+    public async Task<ActionResult<Category>> Create(Category model)
+    {
+        var e = await _svc.CreateAsync(model);
+        return CreatedAtAction(nameof(Get), new { id = e.Id }, e);
+    }
 
-        // GET: api/categories
-        [HttpGet]
-        public async Task<ActionResult<List<Category>>> GetAll()
-        {
-            var categories = await _service.GetAllAsync();
-            return Ok(categories);
-        }
+    [HttpPut("{id:int}")]
+    public async Task<ActionResult<Category>> Update(int id, Category model)
+    {
+        var e = await _svc.UpdateAsync(id, model);
+        return e is null ? NotFound() : Ok(e);
+    }
 
-        // GET: api/categories/5
-        [HttpGet("{id:int}")]
-        public async Task<ActionResult<Category>> Get(int id)
-        {
-            var category = await _service.GetAsync(id);
-            if (category == null)
-                return NotFound();
-            return Ok(category);
-        }
-
-        // POST: api/categories
-        [HttpPost]
-        public async Task<ActionResult<Category>> Create(Category category)
-        {
-            var created = await _service.CreateAsync(category);
-            return CreatedAtAction(nameof(Get), new { id = created.Id }, created);
-        }
-
-        // PUT: api/categories/5
-        [HttpPut("{id:int}")]
-        public async Task<ActionResult<Category>> Update(int id, Category category)
-        {
-            var updated = await _service.UpdateAsync(id, category);
-            if (updated == null)
-                return NotFound();
-            return Ok(updated);
-        }
-
-        // DELETE: api/categories/5
-        [HttpDelete("{id:int}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var deleted = await _service.DeleteAsync(id);
-            if (!deleted)
-                return NotFound();
-            return NoContent();
-        }
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var ok = await _svc.DeleteAsync(id);
+        return ok ? NoContent() : NotFound();
     }
 }

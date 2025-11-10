@@ -6,34 +6,38 @@ namespace Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ItemsController(IItemService svc) : ControllerBase
+public class ItemsController : ControllerBase
 {
-    [HttpGet]
-    public async Task<ActionResult<List<Item>>> GetAll() => await svc.GetAllAsync();
+    private readonly IItemService _svc;
+    public ItemsController(IItemService svc) => _svc = svc;
+
+    [HttpGet] public Task<List<Item>> GetAll() => _svc.GetAllAsync();
 
     [HttpGet("{id:int}")]
     public async Task<ActionResult<Item>> Get(int id)
-        => await svc.GetAsync(id) is { } it ? it : NotFound();
+    {
+        var e = await _svc.GetAsync(id);
+        return e is null ? NotFound() : Ok(e);
+    }
 
     [HttpPost]
-    public async Task<ActionResult<Item>> Create(Item item)
+    public async Task<ActionResult<Item>> Create(Item model)
     {
-        var created = await svc.CreateAsync(item);
-        return CreatedAtAction(nameof(Get), new { id = created.Id }, created);
+        var e = await _svc.CreateAsync(model);
+        return CreatedAtAction(nameof(Get), new { id = e.Id }, e);
     }
 
     [HttpPut("{id:int}")]
-    public async Task<ActionResult<Item>> Update(int id, Item item)
-        => await svc.UpdateAsync(id, item) is { } it ? it : NotFound();
+    public async Task<ActionResult<Item>> Update(int id, Item model)
+    {
+        var e = await _svc.UpdateAsync(id, model);
+        return e is null ? NotFound() : Ok(e);
+    }
 
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
-        => await svc.DeleteAsync(id) ? NoContent() : NotFound();
-
-    [HttpGet("low-stock/{threshold:int}")]
-    public async Task<ActionResult<List<Item>>> LowStock(int threshold = 5)
     {
-        var all = await svc.GetAllAsync();
-        return all.Where(i => i.Quantity < threshold).ToList();
+        var ok = await _svc.DeleteAsync(id);
+        return ok ? NoContent() : NotFound();
     }
 }

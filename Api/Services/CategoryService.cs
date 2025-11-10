@@ -2,40 +2,41 @@
 using Api.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace Api.Services
+namespace Api.Services;
+
+public class CategoryService : ICategoryService
 {
-    public class CategoryService : ICategoryService
+    private readonly AppDbContext _db;
+    public CategoryService(AppDbContext db) => _db = db;
+
+    public Task<List<Category>> GetAllAsync() =>
+        _db.Categories.AsNoTracking().OrderBy(x => x.Name).ToListAsync();
+
+    public Task<Category?> GetAsync(int id) =>
+        _db.Categories.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+
+    public async Task<Category> CreateAsync(Category entity)
     {
-        private readonly AppDbContext _db;
-        public CategoryService(AppDbContext db) => _db = db;
+        _db.Categories.Add(entity);
+        await _db.SaveChangesAsync();
+        return entity;
+    }
 
-        public Task<List<Category>> GetAllAsync() => _db.Categories.OrderBy(c => c.Name).ToListAsync();
+    public async Task<Category?> UpdateAsync(int id, Category entity)
+    {
+        var existing = await _db.Categories.FirstOrDefaultAsync(x => x.Id == id);
+        if (existing is null) return null;
+        existing.Name = entity.Name;
+        await _db.SaveChangesAsync();
+        return existing;
+    }
 
-        public Task<Category?> GetAsync(int id) => _db.Categories.FindAsync(id).AsTask();
-
-        public async Task<Category> CreateAsync(Category e)
-        {
-            _db.Categories.Add(e);
-            await _db.SaveChangesAsync();
-            return e;
-        }
-
-        public async Task<Category?> UpdateAsync(int id, Category e)
-        {
-            var existing = await _db.Categories.FindAsync(id);
-            if (existing is null) return null;
-            existing.Name = e.Name;
-            await _db.SaveChangesAsync();
-            return existing;
-        }
-
-        public async Task<bool> DeleteAsync(int id)
-        {
-            var existing = await _db.Categories.FindAsync(id);
-            if (existing is null) return false;
-            _db.Categories.Remove(existing);
-            await _db.SaveChangesAsync();
-            return true;
-        }
+    public async Task<bool> DeleteAsync(int id)
+    {
+        var existing = await _db.Categories.FirstOrDefaultAsync(x => x.Id == id);
+        if (existing is null) return false;
+        _db.Categories.Remove(existing);
+        await _db.SaveChangesAsync();
+        return true;
     }
 }

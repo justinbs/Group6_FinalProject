@@ -2,63 +2,42 @@
 using Api.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Api.Controllers
+namespace Api.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class SuppliersController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class SuppliersController : ControllerBase
+    private readonly ISupplierService _svc;
+    public SuppliersController(ISupplierService svc) => _svc = svc;
+
+    [HttpGet] public Task<List<Supplier>> GetAll() => _svc.GetAllAsync();
+
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult<Supplier>> Get(int id)
     {
-        private readonly ISupplierService _service;
+        var e = await _svc.GetAsync(id);
+        return e is null ? NotFound() : Ok(e);
+    }
 
-        public SuppliersController(ISupplierService service)
-        {
-            _service = service;
-        }
+    [HttpPost]
+    public async Task<ActionResult<Supplier>> Create(Supplier model)
+    {
+        var e = await _svc.CreateAsync(model);
+        return CreatedAtAction(nameof(Get), new { id = e.Id }, e);
+    }
 
-        // GET: api/suppliers
-        [HttpGet]
-        public async Task<ActionResult<List<Supplier>>> GetAll()
-        {
-            var suppliers = await _service.GetAllAsync();
-            return Ok(suppliers);
-        }
+    [HttpPut("{id:int}")]
+    public async Task<ActionResult<Supplier>> Update(int id, Supplier model)
+    {
+        var e = await _svc.UpdateAsync(id, model);
+        return e is null ? NotFound() : Ok(e);
+    }
 
-        // GET: api/suppliers/5
-        [HttpGet("{id:int}")]
-        public async Task<ActionResult<Supplier>> Get(int id)
-        {
-            var supplier = await _service.GetAsync(id);
-            if (supplier == null)
-                return NotFound();
-            return Ok(supplier);
-        }
-
-        // POST: api/suppliers
-        [HttpPost]
-        public async Task<ActionResult<Supplier>> Create(Supplier supplier)
-        {
-            var created = await _service.CreateAsync(supplier);
-            return CreatedAtAction(nameof(Get), new { id = created.Id }, created);
-        }
-
-        // PUT: api/suppliers/5
-        [HttpPut("{id:int}")]
-        public async Task<ActionResult<Supplier>> Update(int id, Supplier supplier)
-        {
-            var updated = await _service.UpdateAsync(id, supplier);
-            if (updated == null)
-                return NotFound();
-            return Ok(updated);
-        }
-
-        // DELETE: api/suppliers/5
-        [HttpDelete("{id:int}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            var deleted = await _service.DeleteAsync(id);
-            if (!deleted)
-                return NotFound();
-            return NoContent();
-        }
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var ok = await _svc.DeleteAsync(id);
+        return ok ? NoContent() : NotFound();
     }
 }
