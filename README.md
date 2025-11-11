@@ -107,12 +107,12 @@ dotnet ef database update
 
 - Seed sample data for testing (e.g., items, suppliers, categories)
 
-####Run the API:
+#### Run the API:
 
 dotnet run
 
 
-####Once it’s running, open your browser and go to:
+#### Once it’s running, open your browser and go to:
 
 http://localhost:5238/swagger
 
