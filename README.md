@@ -127,7 +127,7 @@ http://localhost:5238/swagger
 
 - Press F5 or click Start to launch the GUI.
 
-- The application will automatically connect to the API at http://localhost:5238.
+- The application will automatically connect to the API at http://localhost:5238/swagger.
 
 #### Notes
 
