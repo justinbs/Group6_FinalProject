@@ -26,6 +26,7 @@ namespace Client.WinForms
 
         private async void Form1_Load(object? sender, EventArgs e)
         {
+            await ApiBase.WaitForApiAsync();
             await LoadLookupsAsync();
             await LoadItemsAsync();
             BuildGridColumns();
